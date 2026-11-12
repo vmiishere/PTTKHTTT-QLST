@@ -109,7 +109,7 @@
         response.sendRedirect("LoginUI1.jsp?registered=success");
     } else {
         // Lỗi lưu CSDL
-        request.setAttribute("errorMessage", "System Error: Failed to register account into database. Please try again later.");
+        request.setAttribute("errorMessage", "System Error: Registration failed. Please try again later.");
         request.getRequestDispatcher("RegisterUI1.jsp").forward(request, response);
     }
 %>

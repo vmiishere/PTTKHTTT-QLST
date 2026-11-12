@@ -70,7 +70,7 @@
                 <i class="fa-solid fa-circle-check text-emerald-600 text-lg mt-0.5 shrink-0"></i>
                 <div>
                     <h4 class="text-xs font-bold text-emerald-900">Registration Successful!</h4>
-                    <p class="text-xs text-emerald-700 mt-0.5 leading-relaxed" id="outMessage">Your customer account has been registered and saved to the database. Please sign in.</p>
+                    <p class="text-xs text-emerald-700 mt-0.5 leading-relaxed" id="outMessage">Your customer account has been registered successfully. Please sign in.</p>
                 </div>
             </div>
         <% } %>
