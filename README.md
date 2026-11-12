@@ -40,14 +40,14 @@ qlst-project/
 │   │   │   └── db.properties   # Cấu hình kết nối MySQL
 │   │   └── webapp/             # Các trang giao diện JSP
 │   │       ├── WEB-INF/web.xml # Cấu hình ứng dụng web
-│   │       ├── ManagerHome1.jsp
-│   │       ├── SelectReport1.jsp
-│   │       ├── ItemRevenueStat1.jsp
-│   │       ├── ItemTransactionDetail1.jsp
-│   │       ├── InvoiceDetail1.jsp
-│   │       ├── CustomerHome1.jsp
-│   │       ├── Register1.jsp
-│   │       └── Login1.jsp
+│   │       ├── ManagerHomeUI1.jsp
+│   │       ├── SelectReportUI1.jsp
+│   │       ├── ItemRevenueStatUI1.jsp
+│   │       ├── ItemTransactionDetailUI1.jsp
+│   │       ├── InvoiceDetailUI1.jsp
+│   │       ├── CustomerHomeUI1.jsp
+│   │       ├── RegisterUI1.jsp
+│   │       └── LoginUI1.jsp
 │   └── test/
 │       └── java/dao/           # Các test case JUnit kiểm thử DAO
 ```

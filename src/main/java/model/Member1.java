@@ -10,10 +10,13 @@ public class Member1 implements Serializable {
     private String username;
     private String password;
     private String name;
+    private FullName1 fullName;
     private Date dob;
     private String tel;
     private String email;
     private String role;
+    private String note;
+    private Address1 address;
 
     public Member1() {
     }
@@ -64,11 +67,28 @@ public class Member1 implements Serializable {
     }
 
     public String getName() {
-        return name;
+        if (name != null && !name.isEmpty()) {
+            return name;
+        }
+        if (fullName != null) {
+            return fullName.toString();
+        }
+        return "";
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public FullName1 getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(FullName1 fullName) {
+        this.fullName = fullName;
+        if (fullName != null) {
+            this.name = fullName.toString();
+        }
     }
 
     public Date getDob() {
@@ -101,5 +121,21 @@ public class Member1 implements Serializable {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public Address1 getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address1 address) {
+        this.address = address;
     }
 }

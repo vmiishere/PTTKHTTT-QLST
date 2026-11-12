@@ -1,6 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List, java.util.Date, java.text.SimpleDateFormat, model.Invoice1, model.Item1, model.SaleItem1, dao.InvoiceDAO1" %>
+<%-- 
+    ============================================================================================
+    GIAO DIỆN: ItemTransactionDetailUI1.jsp - Xem Chi Tiết Các Lần Giao Dịch Của Mặt Hàng
+    PHÂN HỆ: Module 2 - Quản lý xem thống kê mặt hàng theo doanh thu
+    TÁC NHÂN: Quản lý siêu thị (Manager)
+    MÔ TẢ: 
+      - Màn hình hiển thị danh sách tất cả các hóa đơn (lần giao dịch) có chứa mặt hàng được chọn
+        trong khoảng thời gian (startDate -> endDate) đã lọc ở màn hình trước.
+      - Tiếp nhận thông tin mặt hàng từ ItemRevenueStatUI1.jsp truyền sang (không gọi truy vấn Item thừa).
+      - Gọi InvoiceDAO1.getTransactionByItem(itemId, start, end) để lấy danh sách Invoice1.
+      - Cho phép Quản lý click vào một hóa đơn bất kỳ để xem chi tiết toàn bộ hóa đơn đó (InvoiceDetailUI1.jsp).
+    ============================================================================================
+--%>
 <%
+    // =========================================================================================
+    // BƯỚC 1: TIẾP NHẬN CÁC THAM SỐ TỪ REQUEST (Truyền từ ItemRevenueStatUI1.jsp)
+    // =========================================================================================
+    // 1. Mã ID của mặt hàng được chọn và khoảng thời gian:
     String itemIdStr = request.getParameter("itemId");
     String itemCode = request.getParameter("itemCode");
     String itemName = request.getParameter("name");
@@ -9,6 +26,7 @@
     String startDateStr = request.getParameter("startDate");
     String endDateStr = request.getParameter("endDate");
 
+    // Ép kiểu ID an toàn
     int itemId = 1;
     try {
         if (itemIdStr != null && !itemIdStr.trim().isEmpty()) {
@@ -16,6 +34,7 @@
         }
     } catch (Exception ignored) {}
 
+    // Thiết lập giá trị mặc định cho khoảng ngày nếu trống
     if (startDateStr == null || startDateStr.trim().isEmpty()) startDateStr = "2026-10-01";
     if (endDateStr == null || endDateStr.trim().isEmpty()) endDateStr = "2026-10-31";
 
@@ -24,7 +43,11 @@
     if (itemBrand == null) itemBrand = "N/A";
     if (itemModel == null) itemModel = "N/A";
 
-    // Item information flows directly from previous screen (no DAO call for item, strictly matching design)
+    // =========================================================================================
+    // BƯỚC 2: KHỞI TẠO ĐỐI TƯỢNG Item1 CHỨA THÔNG TIN MẶT HÀNG ĐANG XEM
+    // Lưu ý: Thông tin mặt hàng đã được truyền đầy đủ qua URL param từ màn hình thống kê trước,
+    // tuân thủ chặt chẽ biểu đồ thiết kế (không gọi DAO truy vấn lại Item thừa thãi).
+    // =========================================================================================
     Item1 selectedItem = new Item1();
     selectedItem.setId(itemId);
     selectedItem.setItemCode(itemCode);
@@ -35,7 +58,12 @@
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     SimpleDateFormat sdfDisplay = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    // Only query InvoiceDAO1 as specified in design Sequence & Class Diagram
+    // =========================================================================================
+    // BƯỚC 3: GỌI TẦNG DAO TRUY VẤN CƠ SỞ DỮ LIỆU (Khớp chuẩn 100% với Biểu đồ tuần tự)
+    // - Khởi tạo InvoiceDAO1
+    // - Gọi phương thức: getTransactionByItem(itemId, startDate, endDate)
+    // - Trả về: Danh sách List<Invoice1> các hóa đơn xuất bán có chứa mặt hàng này
+    // =========================================================================================
     List<Invoice1> listInvoice = null;
     double totalItemRevenue = 0.0;
     int totalItemQuantity = 0;
@@ -65,6 +93,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Item Transactions Detail - Supermarket Management System</title>
+    <!-- Thư viện CSS Tailwind và FontAwesome Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -75,12 +104,15 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen py-8">
     <div class="max-w-6xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <!-- Header: Clean layout without redundant top total -->
+        
+        <!-- ================================================================================= -->
+        <!-- PHẦN 1: HEADER THÔNG TIN MẶT HÀNG ĐANG XEM GIAO DỊCH -->
+        <!-- ================================================================================= -->
         <div class="flex flex-wrap justify-between items-start gap-4 border-b border-slate-200 pb-4">
             <div>
                 <h3 class="font-extrabold text-slate-900 text-lg">Item Transactions Detail</h3>
                 
-                <!-- Item Information carried from previous screen -->
+                <!-- Thông tin chi tiết của mặt hàng được mang từ màn hình trước sang -->
                 <div class="mt-1 text-xs text-slate-700 space-y-0.5">
                     <p>Selected item: <span class="font-bold text-indigo-900 text-sm"><%= selectedItem.getName() %></span> (Code: <span class="font-mono-code font-bold"><%= selectedItem.getItemCode() %></span>)</p>
                     <p class="text-slate-500">Brand: <span class="font-semibold text-slate-700"><%= selectedItem.getBrand() %></span> | Model: <span class="font-mono-code text-slate-700"><%= selectedItem.getModel() %></span></p>
@@ -92,7 +124,9 @@
             </div>
         </div>
 
-        <!-- tblTransaction displaying listInvoice -->
+        <!-- ================================================================================= -->
+        <!-- PHẦN 2: BẢNG DANH SÁCH CÁC LẦN GIAO DỊCH (tblTransaction) -->
+        <!-- ================================================================================= -->
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
             <table class="w-full text-xs text-left" id="tblTransaction">
                 <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
@@ -110,6 +144,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     <%
+                        // Lặp qua từng hóa đơn trong danh sách trả về từ DAO
                         if (listInvoice != null && !listInvoice.isEmpty()) {
                             int idx = 1;
                             for (Invoice1 inv : listInvoice) {
@@ -151,8 +186,8 @@
                         <td class="py-3.5 px-3 text-right font-black text-indigo-900"><%= String.format(java.util.Locale.US, "%,.2f", iAmt) %></td>
                         <td class="py-3.5 px-3 text-right font-medium text-slate-500"><%= String.format(java.util.Locale.US, "%,.2f", inv.getTotalAmount()) %></td>
                         <td class="py-3.5 px-3 text-center">
-                            <!-- selectInvoice : link -->
-                            <a href="InvoiceDetail1.jsp?invoiceId=<%= inv.getId() %>&itemId=<%= itemId %>&itemCode=<%= java.net.URLEncoder.encode(selectedItem.getItemCode(), "UTF-8") %>&name=<%= java.net.URLEncoder.encode(selectedItem.getName(), "UTF-8") %>&brand=<%= java.net.URLEncoder.encode(selectedItem.getBrand(), "UTF-8") %>&model=<%= java.net.URLEncoder.encode(selectedItem.getModel(), "UTF-8") %>&startDate=<%= startDateStr %>&endDate=<%= endDateStr %>" class="text-indigo-600 font-semibold hover:underline inline-flex items-center">
+                            <!-- Nút chọn xem chi tiết hóa đơn (selectInvoice -> điều hướng sang InvoiceDetailUI1.jsp) -->
+                            <a href="InvoiceDetailUI1.jsp?invoiceId=<%= inv.getId() %>&itemId=<%= itemId %>&itemCode=<%= java.net.URLEncoder.encode(selectedItem.getItemCode(), "UTF-8") %>&name=<%= java.net.URLEncoder.encode(selectedItem.getName(), "UTF-8") %>&brand=<%= java.net.URLEncoder.encode(selectedItem.getBrand(), "UTF-8") %>&model=<%= java.net.URLEncoder.encode(selectedItem.getModel(), "UTF-8") %>&startDate=<%= startDateStr %>&endDate=<%= endDateStr %>" class="text-indigo-600 font-semibold hover:underline inline-flex items-center">
                                 View Invoice →
                             </a>
                         </td>
@@ -166,7 +201,7 @@
                     </tr>
                     <% } %>
                 </tbody>
-                <!-- Dòng Total duy nhất nằm ở chân bảng theo chuẩn kế toán -->
+                <!-- Dòng Total tính tổng theo chuẩn kế toán ở chân bảng -->
                 <tfoot class="bg-indigo-50/80 text-indigo-950 font-bold border-t-2 border-indigo-200">
                     <tr>
                         <td colspan="5" class="py-3.5 px-3 text-right uppercase tracking-wider text-xs">Total:</td>
@@ -179,9 +214,11 @@
             </table>
         </div>
 
+        <!-- ================================================================================= -->
+        <!-- PHẦN 3: NÚT QUAY LẠI MÀN HÌNH THỐNG KÊ DOANH THU (btnBack) -->
+        <!-- ================================================================================= -->
         <div class="flex justify-between items-center pt-2">
-            <!-- btnBack -->
-            <a href="ItemRevenueStat1.jsp?startDate=<%= startDateStr %>&endDate=<%= endDateStr %>" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 inline-flex items-center">
+            <a href="ItemRevenueStatUI1.jsp?startDate=<%= startDateStr %>&endDate=<%= endDateStr %>" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 inline-flex items-center">
                 <i class="fa-solid fa-arrow-left mr-1.5"></i>Back
             </a>
         </div>

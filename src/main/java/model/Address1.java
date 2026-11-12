@@ -7,6 +7,7 @@ public class Address1 implements Serializable {
 
     private int id;
     private String houseNumber;
+    private String building;
     private String street;
     private String ward;
     private String city;
@@ -21,9 +22,26 @@ public class Address1 implements Serializable {
         this.city = city;
     }
 
+    public Address1(String houseNumber, String building, String street, String ward, String city) {
+        this.houseNumber = houseNumber;
+        this.building = building;
+        this.street = street;
+        this.ward = ward;
+        this.city = city;
+    }
+
     public Address1(int id, String houseNumber, String street, String ward, String city) {
         this.id = id;
         this.houseNumber = houseNumber;
+        this.street = street;
+        this.ward = ward;
+        this.city = city;
+    }
+
+    public Address1(int id, String houseNumber, String building, String street, String ward, String city) {
+        this.id = id;
+        this.houseNumber = houseNumber;
+        this.building = building;
         this.street = street;
         this.ward = ward;
         this.city = city;
@@ -43,6 +61,14 @@ public class Address1 implements Serializable {
 
     public void setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
+    }
+
+    public String getBuilding() {
+        return building;
+    }
+
+    public void setBuilding(String building) {
+        this.building = building;
     }
 
     public String getStreet() {
@@ -72,10 +98,11 @@ public class Address1 implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (houseNumber != null && !houseNumber.trim().isEmpty()) {
-            sb.append(houseNumber).append(", ");
-        }
-        sb.append(street).append(", ").append(ward).append(", ").append(city);
-        return sb.toString();
+        if (houseNumber != null && !houseNumber.isEmpty()) sb.append(houseNumber).append(", ");
+        if (building != null && !building.isEmpty()) sb.append(building).append(", ");
+        if (street != null && !street.isEmpty()) sb.append(street).append(", ");
+        if (ward != null && !ward.isEmpty()) sb.append(ward).append(", ");
+        if (city != null && !city.isEmpty()) sb.append(city);
+        return sb.toString().replaceAll(", $", "");
     }
 }

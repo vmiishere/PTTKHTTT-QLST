@@ -1,7 +1,27 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.text.SimpleDateFormat, model.Invoice1, model.SaleItem1, dao.InvoiceDAO1" %>
+<%-- 
+    ============================================================================================
+    GIAO DIỆN: InvoiceDetailUI1.jsp - Xem Chi Tiết Hóa Đơn Bán Lẻ
+    PHÂN HỆ: Module 2 - Quản lý xem thống kê mặt hàng theo doanh thu
+    TÁC NHÂN: Quản lý siêu thị (Manager)
+    MÔ TẢ: 
+      - Màn hình hiển thị chi tiết đầy đủ của một hóa đơn cụ thể khi Quản lý click chọn 
+        một mã hóa đơn từ danh sách các lần giao dịch (ItemTransactionDetailUI1.jsp).
+      - Hiển thị: Mã hóa đơn, thời gian thanh toán, phương thức, trạng thái, khách hàng,
+        thu ngân lập hóa đơn và bảng chi tiết danh sách các mặt hàng đã mua (SaleItem1).
+      - Tự động làm nổi bật (highlight) mặt hàng đang được theo dõi thống kê từ các màn hình trước.
+    ============================================================================================
+--%>
 <%
+    // =========================================================================================
+    // BƯỚC 1: TIẾP NHẬN CÁC THAM SỐ TỪ REQUEST (Truyền từ ItemTransactionDetailUI1.jsp)
+    // =========================================================================================
+    // 1. Mã định danh hóa đơn (ID) dùng để truy vấn CSDL:
     String invoiceIdStr = request.getParameter("invoiceId");
+
+    // 2. Các tham số ngữ cảnh (Context parameters) của mặt hàng đang theo dõi:
+    //    (Lưu giữ lại để khi bấm nút "Back to Transactions" sẽ quay lại đúng mặt hàng và khoảng thời gian đó)
     String itemIdStr = request.getParameter("itemId");
     String itemCode = request.getParameter("itemCode");
     String itemName = request.getParameter("name");
@@ -10,6 +30,9 @@
     String startDateStr = request.getParameter("startDate");
     String endDateStr = request.getParameter("endDate");
 
+    // =========================================================================================
+    // BƯỚC 2: ÉP KIỂU VÀ XỬ LÝ DỮ LIỆU AN TOÀN
+    // =========================================================================================
     int invoiceId = 1;
     int currentItemId = 1;
     try {
@@ -17,9 +40,16 @@
         if (itemIdStr != null) currentItemId = Integer.parseInt(itemIdStr);
     } catch (Exception ignored) {}
 
+    // =========================================================================================
+    // BƯỚC 3: GỌI TẦNG DAO TRUY VẤN CƠ SỞ DỮ LIỆU (Khớp chuẩn 100% với Biểu đồ tuần tự)
+    // - Khởi tạo đối tượng truy xuất dữ liệu: InvoiceDAO1
+    // - Gọi phương thức: getInvoiceDetail(invoiceId)
+    // - Nhận về đối tượng: Invoice1 (chứa thông tin hóa đơn, Customer, Staff và List<SaleItem1>)
+    // =========================================================================================
     InvoiceDAO1 invoiceDAO = new InvoiceDAO1();
     Invoice1 inv = invoiceDAO.getInvoiceDetail(invoiceId);
 
+    // Định dạng ngày giờ hiển thị giao dịch: yyyy-MM-dd HH:mm
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 %>
 <!DOCTYPE html>
@@ -27,6 +57,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Invoice Detail - Supermarket Management System</title>
+    <!-- Thư viện CSS Tailwind và FontAwesome Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -37,15 +68,21 @@
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen py-8">
     <div class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-        <!-- Header -->
+        
+        <!-- ================================================================================= -->
+        <!-- PHẦN 1: TIÊU ĐỀ MÀN HÌNH & MÃ HÓA ĐƠN -->
+        <!-- ================================================================================= -->
         <div class="border-b border-slate-200 pb-4">
             <h3 class="font-extrabold text-slate-900 text-xl tracking-tight">Invoice Detail</h3>
             <p class="text-xs text-slate-500 mt-0.5">Invoice Code: <span class="font-mono-code font-bold text-indigo-900"><%= (inv != null) ? inv.getInvoiceCode() : "N/A" %></span></p>
         </div>
 
         <% if (inv != null) { %>
-            <!-- Invoice Metadata Grid -->
+            <!-- ============================================================================= -->
+            <!-- PHẦN 2: KHỐI THÔNG TIN CHUNG CỦA HÓA ĐƠN (Metadata: Ngày, KH, Thu ngân, Trạng thái) -->
+            <!-- ============================================================================= -->
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Cột trái: Thời gian, Hình thức thanh toán, Khách hàng -->
                 <div class="space-y-2">
                     <div>
                         <span class="text-slate-500 block">Date:</span>
@@ -65,6 +102,7 @@
                     </div>
                 </div>
 
+                <!-- Cột phải: Trạng thái hóa đơn, Nhân viên lập hóa đơn, Ghi chú -->
                 <div class="space-y-2">
                     <div>
                         <span class="text-slate-500 block">Status:</span>
@@ -108,7 +146,9 @@
                 </div>
             </div>
 
-            <!-- Purchased Items Table -->
+            <!-- ============================================================================= -->
+            <!-- PHẦN 3: BẢNG CHI TIẾT CÁC MẶT HÀNG TRONG HÓA ĐƠN (List<SaleItem1>) -->
+            <!-- ============================================================================= -->
             <div class="space-y-2">
                 <div class="flex justify-between items-center">
                     <h4 class="font-bold text-slate-800 text-xs tracking-wider uppercase">Purchased Sale Items:</h4>
@@ -128,9 +168,11 @@
                         </thead>
                         <tbody class="divide-y divide-slate-200">
                             <%
+                                // Duyệt qua từng dòng hàng (SaleItem1) của hóa đơn
                                 if (inv.getSaleItems() != null && !inv.getSaleItems().isEmpty()) {
                                     int sIdx = 1;
                                     for (SaleItem1 si : inv.getSaleItems()) {
+                                        // Kiểm tra xem mặt hàng này có đúng là mặt hàng đang được Quản lý theo dõi từ màn hình trước không
                                         boolean isInspected = (si.getItem() != null && si.getItem().getId() == currentItemId);
                             %>
                             <tr class="<%= isInspected ? "bg-indigo-50/80 font-bold border-l-4 border-indigo-600" : "hover:bg-slate-50" %>">
@@ -159,6 +201,7 @@
                             </tr>
                             <% } %>
                         </tbody>
+                        <!-- Tổng tiền toàn bộ hóa đơn -->
                         <tfoot class="bg-slate-50 border-t border-slate-200 font-bold">
                             <tr>
                                 <td colspan="5" class="py-3 px-3 text-right">Total Invoice Amount:</td>
@@ -172,8 +215,12 @@
             <div class="py-8 text-center text-slate-400 font-medium">Invoice not found.</div>
         <% } %>
 
+        <!-- ============================================================================= -->
+        <!-- PHẦN 4: NÚT ĐIỀU HƯỚNG QUAY LẠI (Back button) -->
+        <!-- Giữ nguyên đầy đủ itemId, khoảng thời gian startDate, endDate để quay lại đúng ngữ cảnh -->
+        <!-- ============================================================================= -->
         <div class="pt-2 flex justify-between items-center">
-            <a href="ItemTransactionDetail1.jsp?itemId=<%= currentItemId %>&itemCode=<%= (itemCode != null ? java.net.URLEncoder.encode(itemCode, "UTF-8") : "ITM-01") %>&name=<%= (itemName != null ? java.net.URLEncoder.encode(itemName, "UTF-8") : "Electronic+Item") %>&brand=<%= (itemBrand != null ? java.net.URLEncoder.encode(itemBrand, "UTF-8") : "") %>&model=<%= (itemModel != null ? java.net.URLEncoder.encode(itemModel, "UTF-8") : "") %>&startDate=<%= (startDateStr != null ? startDateStr : "2026-10-01") %>&endDate=<%= (endDateStr != null ? endDateStr : "2026-10-31") %>" class="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 inline-flex items-center">
+            <a href="ItemTransactionDetailUI1.jsp?itemId=<%= currentItemId %>&itemCode=<%= (itemCode != null ? java.net.URLEncoder.encode(itemCode, "UTF-8") : "ITM-01") %>&name=<%= (itemName != null ? java.net.URLEncoder.encode(itemName, "UTF-8") : "Electronic+Item") %>&brand=<%= (itemBrand != null ? java.net.URLEncoder.encode(itemBrand, "UTF-8") : "") %>&model=<%= (itemModel != null ? java.net.URLEncoder.encode(itemModel, "UTF-8") : "") %>&startDate=<%= (startDateStr != null ? startDateStr : "2026-10-01") %>&endDate=<%= (endDateStr != null ? endDateStr : "2026-10-31") %>" class="px-5 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-300 inline-flex items-center">
                 <i class="fa-solid fa-arrow-left mr-1.5"></i>Back to Transactions
             </a>
         </div>
