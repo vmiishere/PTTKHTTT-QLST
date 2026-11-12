@@ -23,10 +23,10 @@
 
     // Nếu không truyền tham số, gán khoảng thời gian mặc định
     if (startDateStr == null || startDateStr.trim().isEmpty()) {
-        startDateStr = "2026-10-01";
+        startDateStr = "2026-11-01";
     }
     if (endDateStr == null || endDateStr.trim().isEmpty()) {
-        endDateStr = "2026-10-31";
+        endDateStr = "2026-11-30";
     }
 
     SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

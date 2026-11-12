@@ -35,8 +35,8 @@
     } catch (Exception ignored) {}
 
     // Thiết lập giá trị mặc định cho khoảng ngày nếu trống
-    if (startDateStr == null || startDateStr.trim().isEmpty()) startDateStr = "2026-10-01";
-    if (endDateStr == null || endDateStr.trim().isEmpty()) endDateStr = "2026-10-31";
+    if (startDateStr == null || startDateStr.trim().isEmpty()) startDateStr = "2026-11-01";
+    if (endDateStr == null || endDateStr.trim().isEmpty()) endDateStr = "2026-11-30";
 
     if (itemCode == null || itemCode.trim().isEmpty()) itemCode = "ITM-01";
     if (itemName == null || itemName.trim().isEmpty()) itemName = "Electronic Item";

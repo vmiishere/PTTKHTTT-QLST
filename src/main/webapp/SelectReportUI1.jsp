@@ -75,13 +75,13 @@
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         Start Date (*)
                     </label>
-                    <input type="date" id="startDate" name="startDate" value="2026-10-01" required onchange="validateDateCriteria()" class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
+                    <input type="date" id="startDate" name="startDate" value="2026-11-01" required onchange="validateDateCriteria()" class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1.5">
                         End Date (*)
                     </label>
-                    <input type="date" id="endDate" name="endDate" value="2026-10-31" required onchange="validateDateCriteria()" class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
+                    <input type="date" id="endDate" name="endDate" value="2026-11-30" required onchange="validateDateCriteria()" class="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
                 </div>
             </div>
 
